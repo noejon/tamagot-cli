@@ -1,0 +1,13 @@
+{
+  "exec": "npm run dev",
+  "ext": "ts",
+  "ignore": [
+    "**/*.test.ts",
+    ".git",
+    "node_modules"
+  ],
+  "restartable": "rs",
+  "watch": [
+    "src/"
+  ]
+}
