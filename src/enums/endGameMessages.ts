@@ -1,4 +1,4 @@
 export enum EndGameMessages {
-  loss,
-  win,
+  loss = 'loss',
+  win = 'win',
 }

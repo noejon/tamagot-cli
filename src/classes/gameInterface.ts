@@ -1,28 +1,28 @@
-import { Terminal } from 'terminal-kit';
+import { terminal, Terminal } from 'terminal-kit';
 import {
-  GAME_RULES,
-  GAME_MENU,
-  PLAYER_CHOICE,
-  GAME_MESSAGES,
   END_GAME_MESSAGES,
+  TERMINAL_GAME_MENU,
+  GAME_MESSAGES,
+  GAME_RULES,
+  LIFE_STAGE_EMOTICONS,
+  TERMINAL_PLAYER_CHOICE,
 } from '../constants';
 import { PetStatus } from '../types/petStatus';
 import { GameMenu } from '../enums/gameMenu';
-import { LifeStage } from '../enums/lifeStages';
 import { PlayerChoice } from '../enums/playerChoice';
 import { EndGameMessages } from '../enums/endGameMessages';
 
 export default class GameInterface {
   #terminal: Terminal;
 
-  constructor(terminal: Terminal) {
+  constructor() {
     this.#terminal = terminal;
     this.initialiseTerminal();
   }
 
   async promptMainMenu(): Promise<GameMenu> {
     try {
-      const choice = await this.singleColumnMenu(GAME_MENU);
+      const choice = await this.singleColumnMenu(TERMINAL_GAME_MENU);
       if (choice.selectedIndex === 0) {
         this.#terminal.clear();
         return GameMenu.start;
@@ -36,7 +36,7 @@ export default class GameInterface {
 
   async promptPlayerChoice(): Promise<PlayerChoice> {
     try {
-      const choice = await this.singleColumnMenu(PLAYER_CHOICE);
+      const choice = await this.singleColumnMenu(TERMINAL_PLAYER_CHOICE);
       switch (choice.selectedIndex) {
         case 0:
           return PlayerChoice.pollStatus;
@@ -56,23 +56,14 @@ export default class GameInterface {
     }
   }
 
-  displayChoiceResponse(choice: PlayerChoice | 5 = 5): void {
-    if (GAME_MESSAGES[choice]) this.#terminal.clear();
-    const starRow = '*'.repeat(50);
-    this.#terminal(
-      `${
-        GAME_MESSAGES[choice] &&
-        `\n${starRow}\n\n#${GAME_MESSAGES[choice]}\n\n${starRow}\n`
-      }`
-    );
+  displayChoiceResponse(choice: PlayerChoice | 'sleeping' = 'sleeping'): void {
+    if (GAME_MESSAGES[choice]) {
+      this.displayMessageInStarRow(GAME_MESSAGES[choice]);
+    }
   }
 
   displayEndGameMessage(status: EndGameMessages): void {
-    const starRow = '*'.repeat(50);
-    this.#terminal.clear();
-    this.#terminal(
-      `\n${starRow}\n\n#${END_GAME_MESSAGES[status]}\n\n${starRow}\n`
-    );
+    this.displayMessageInStarRow(END_GAME_MESSAGES[status]);
   }
 
   displayRules(): void {
@@ -91,13 +82,19 @@ export default class GameInterface {
       vigor,
     } = status;
     this.#terminal.clear();
-    this.#terminal(LifeStage[lifeStage]);
-    this.displayValue(age, 'Age', 'years old');
-    this.displayValue(health, 'Health');
-    this.displayValue(morale, 'Morale');
-    this.displayValue(satiety, 'Satiety');
-    this.displayValue(vigor, 'Vigor');
-    this.displayValue(poopCount, 'Poop');
+    const starRow = '*'.repeat(50);
+    this.#terminal(`\n${starRow}\n\n`);
+    const lifeStageEmoticons = LIFE_STAGE_EMOTICONS[lifeStage].repeat(2);
+    this.#terminal(
+      `${lifeStageEmoticons}  ${lifeStage}  ${lifeStageEmoticons}`
+    );
+    this.displayValue(age, '🎂🎂  Age 🎂🎂 ', 'years old');
+    this.displayValue(health, '🏥🏥  Health  🏥🏥');
+    this.displayValue(morale, '😃😃 Morale 😃😃');
+    this.displayValue(satiety, '🥣🥣  Satiety  🥣🥣');
+    this.displayValue(vigor, '💤💤 Vigor 💤💤');
+    this.displayValue(poopCount, '💩💩 Poop 💩💩');
+    this.#terminal(`\n\n${starRow}\n`);
   }
 
   /**
@@ -108,6 +105,12 @@ export default class GameInterface {
   terminate(): void {
     this.#terminal.clear();
     this.#terminal.processExit(0);
+  }
+
+  private displayMessageInStarRow(message: string): void {
+    const starRow = '*'.repeat(50);
+    this.#terminal.clear();
+    this.#terminal(`\n${starRow}\n\n${message}\n\n${starRow}\n`);
   }
 
   private displayValue(value: number, label?: string, suffix?: string): void {

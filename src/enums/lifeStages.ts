@@ -1,7 +1,6 @@
 export enum LifeStage {
-  Baby,
-  Child,
-  Teenage,
-  Adult,
-  Angel,
+  Baby = 'baby',
+  Child = 'child',
+  Teenager = 'teenager',
+  Adult = 'adult',
 }

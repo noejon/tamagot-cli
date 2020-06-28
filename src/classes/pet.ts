@@ -3,7 +3,7 @@ import { Organism } from '../interfaces/organism';
 import { PetStatus } from '../types/petStatus';
 import { PetConfiguration } from '../types/petConfiguration';
 import { LifeStage } from '../enums/lifeStages';
-import { TEENAGE_MAX_AGE, CHILD_MAX_AGE, BABY_MAX_AGE } from '../constants';
+import { TEENAGER_MAX_AGE, CHILD_MAX_AGE, BABY_MAX_AGE } from '../constants';
 import decrement from '../utils/decrement';
 import increment from '../utils/increment';
 
@@ -46,12 +46,12 @@ export default class Pet implements Organism {
     moraleDecrement = 1,
     moraleIncrement = 3,
     poopIncrement = 1,
-    poopDecrement = 3,
+    poopDecrement = 2,
     poopTreshold = 5,
     satietyDecrement = 2,
-    satietyIncrement = 3,
-    sleepinessTreshold = 5,
-    vigorDecrement = 2,
+    satietyIncrement = 5,
+    sleepinessTreshold = 7,
+    vigorDecrement = 1,
   }: PetConfiguration) {
     this.#maxAge = maxAge;
     this.#maxHealth = maxHealth;
@@ -143,11 +143,10 @@ export default class Pet implements Organism {
   }
 
   private calculateLifeStage(): LifeStage {
-    if (!this.isAlive()) return LifeStage.Angel;
-    if (this.#age > TEENAGE_MAX_AGE) {
+    if (this.#age > TEENAGER_MAX_AGE) {
       return LifeStage.Adult;
     } else if (this.#age > CHILD_MAX_AGE) {
-      return LifeStage.Teenage;
+      return LifeStage.Teenager;
     } else if (this.#age > BABY_MAX_AGE) {
       return LifeStage.Child;
     } else {

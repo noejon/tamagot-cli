@@ -1,4 +1,3 @@
-import { terminal } from 'terminal-kit';
 import GameInterface from './gameInterface';
 import Pet from './pet';
 import { GameMenu } from '../enums/gameMenu';
@@ -10,7 +9,7 @@ export default class GameEngine {
   #pet: Pet;
 
   constructor() {
-    this.#gameInterface = new GameInterface(terminal);
+    this.#gameInterface = new GameInterface();
     this.#pet = new Pet({});
   }
 

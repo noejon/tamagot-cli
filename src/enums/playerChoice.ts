@@ -1,7 +1,7 @@
 export enum PlayerChoice {
-  pollStatus,
-  playGames,
-  feed,
-  sleep,
-  clean,
+  clean = 'clean',
+  feed = 'feed',
+  playGames = 'playGames',
+  pollStatus = 'pollStatus',
+  sleep = 'sleep',
 }

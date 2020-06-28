@@ -1,3 +1,4 @@
+import times from 'lodash/times';
 import Pet from './pet';
 import { LifeStage } from '../enums/lifeStages';
 import { PetStatus } from '../types/petStatus';
@@ -32,15 +33,9 @@ describe('Pet class', () => {
       });
     });
 
-    describe('when we check if the pet is sleepy', () => {
+    describe('when we check if the pet is sleeping', () => {
       it('should return false', () => {
-        expect(pet.isSleepy()).toEqual(false);
-      });
-    });
-
-    describe('when we check if the pet is exhausted', () => {
-      it('should return false', () => {
-        expect(pet.isExhausted()).toEqual(false);
+        expect(pet.isSleeping()).toEqual(false);
       });
     });
 
