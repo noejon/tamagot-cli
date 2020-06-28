@@ -1,4 +1,4 @@
-import times from 'lodash/times';
+// import times from 'lodash/times'; //TODO: Uninstall
 import { Organism } from '../interfaces/organism';
 import { PetStatus } from '../types/petStatus';
 import { PetConfiguration } from '../types/petConfiguration';
@@ -8,19 +8,22 @@ import decrement from '../utils/decrement';
 import increment from '../utils/increment';
 
 export default class Pet implements Organism {
-  #age: number;
+  #age = 0;
   #exhaustionTreshold: number;
+  #foodCounter = 0;
   #health: number;
   #healthGainTresholdPercentage: number;
   #healthIncrement: number;
+  #isSleeping = false;
   #maxAge: number;
   #maxHealth: number;
   #maxSatiety: number;
   #maxMorale: number;
   #maxVigor: number;
   #morale: number;
+  #moraleDecrement: number;
   #moraleIncrement: number;
-  #poopCount: number;
+  #poopCount = 0;
   #poopDecrement: number;
   #poopIncrement: number;
   #poopTreshold: number;
@@ -29,6 +32,7 @@ export default class Pet implements Organism {
   #satietyIncrement: number;
   #sleepinessTreshold: number;
   #vigor: number;
+  #vigorDecrement: number;
 
   constructor({
     exhaustionTreshold = 2,
@@ -39,13 +43,15 @@ export default class Pet implements Organism {
     maxSatiety = 20,
     maxMorale = 10,
     maxVigor = 15,
+    moraleDecrement = 1,
     moraleIncrement = 3,
     poopIncrement = 1,
     poopDecrement = 3,
     poopTreshold = 5,
-    satietyDecrement = 3,
+    satietyDecrement = 2,
     satietyIncrement = 3,
     sleepinessTreshold = 5,
+    vigorDecrement = 2,
   }: PetConfiguration) {
     this.#maxAge = maxAge;
     this.#maxHealth = maxHealth;
@@ -53,11 +59,13 @@ export default class Pet implements Organism {
     this.#maxMorale = maxMorale;
     this.#maxVigor = maxVigor;
     this.#healthIncrement = healthIncrement;
+    this.#moraleDecrement = moraleDecrement;
     this.#moraleIncrement = moraleIncrement;
     this.#poopIncrement = poopIncrement;
     this.#poopDecrement = poopDecrement;
     this.#satietyDecrement = satietyDecrement;
     this.#satietyIncrement = satietyIncrement;
+    this.#vigorDecrement = vigorDecrement;
     this.#exhaustionTreshold = exhaustionTreshold;
     this.#healthGainTresholdPercentage = healthGainTresholdPercentage;
     this.#poopTreshold = poopTreshold;
@@ -66,8 +74,6 @@ export default class Pet implements Organism {
     this.#satiety = this.#maxSatiety;
     this.#morale = this.#maxMorale;
     this.#vigor = this.#maxVigor;
-    this.#age = 0;
-    this.#poopCount = 0;
   }
 
   clean(): void {
@@ -80,31 +86,31 @@ export default class Pet implements Organism {
       this.#satietyIncrement,
       this.#maxSatiety
     );
+    this.#foodCounter++;
   }
 
   isAlive(): boolean {
-    return this.#age <= this.#maxAge;
+    return this.#age <= this.#maxAge && this.#health > 0;
   }
 
-  isExhausted(): boolean {
-    return this.#vigor === this.#exhaustionTreshold;
-  }
-
-  isSleepy(): boolean {
-    return this.#vigor <= this.#sleepinessTreshold;
+  isSleeping(): boolean {
+    return this.#isSleeping;
   }
 
   live(): void {
-    this.#morale = decrement(this.#satiety, this.#satietyDecrement);
+    this.#morale = decrement(this.#morale, this.#moraleDecrement);
     this.#satiety = decrement(this.#satiety, this.#satietyDecrement);
-    this.#vigor = decrement(this.#satiety, this.#satietyDecrement);
+    if (!this.#isSleeping) {
+      this.#vigor = decrement(this.#vigor, this.#vigorDecrement);
+    }
+    this.poo();
     this.damage();
     this.heal();
+    this.handleSleep();
   }
 
   sleep(): void {
-    this.#vigor = this.#maxVigor;
-    times(this.#maxVigor / 3, this.live);
+    this.#isSleeping = true;
     this.#age++;
   }
 
@@ -128,8 +134,12 @@ export default class Pet implements Organism {
     };
   }
 
-  poo(): void {
-    this.#poopCount = increment(this.#poopCount, this.#poopIncrement);
+  private poo(): void {
+    const foodTreshold = Math.floor(Math.random() * 4) + 1;
+    if (this.#foodCounter >= foodTreshold) {
+      this.#poopCount = increment(this.#poopCount, this.#poopIncrement);
+      this.#foodCounter = 0;
+    }
   }
 
   private calculateLifeStage(): LifeStage {
@@ -151,7 +161,23 @@ export default class Pet implements Organism {
     if (this.#satiety === 0) damageAmount++;
     if (this.#morale === 0) damageAmount++;
     if (this.#poopCount > this.#poopTreshold) damageAmount++;
-    this.#health -= damageAmount;
+    this.#health = decrement(this.#health, damageAmount);
+  }
+
+  private handleSleep(): void {
+    if (this.#vigor <= this.#exhaustionTreshold) {
+      this.sleep();
+    }
+    if (this.#isSleeping) {
+      this.#vigor = increment(
+        this.#vigor,
+        Math.floor(Math.random() * this.#sleepinessTreshold) + 1
+      );
+      if (this.#vigor > this.#sleepinessTreshold) {
+        this.#vigor = this.#maxVigor;
+        this.#isSleeping = false;
+      }
+    }
   }
 
   private heal(): void {

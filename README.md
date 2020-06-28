@@ -54,3 +54,15 @@ nvm use
 In subsequent sessions, run `nvm use` to switch to node lts.
 
 Follow the [official documentation](https://docs.microsoft.com/en-us/windows/nodejs/setup-on-windows) on a windows operating system.
+
+## Notes
+
+### Loosing time
+
+I have been loosing quite some time figuring out if there was a way to refresh the status of the pet while the prompt for the next action prompt would remain visible. I believe that it could have been achievable, but it would take me too much time. After watching a video of an old tamagotchi, I realised that the status was not displayed on the screen, but it was rather a choice of the user to get that piece of information. In the end I decided to add it to the list of actions that are available to the user. 
+
+## What I could have done better
+
+### Status refreshing
+
+As I mentioned earlier, it would have been nice to have the pet status refreshing everytime the status changed in the background. I ran out of time for that but I think it could be achieved using [terminal-kit's ScreenBuffer](https://github.com/cronvel/terminal-kit/blob/master/doc/screenbuffer.md#top). 
