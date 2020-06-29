@@ -16,13 +16,7 @@ export default class Tamagotchi implements GameEngine {
 
   async run(): Promise<void> {
     this.#gameInterface.displayRules();
-    const shouldIRun: GameMenu = await this.#gameInterface.promptMainMenu();
-    if (shouldIRun === GameMenu.start) {
-      this.#pet = new Pet({});
-      await this.lifeCycle();
-    } else {
-      this.#gameInterface.terminate();
-    }
+    await this.gameLoop();
   }
 
   private async lifeCycle(): Promise<void> {
@@ -33,7 +27,7 @@ export default class Tamagotchi implements GameEngine {
       await this.chooseAction();
     }
     clearInterval(lifeCycleInterval);
-    this.handleDeath();
+    await this.handleDeath();
   }
 
   private passTime(): void {
@@ -45,12 +39,14 @@ export default class Tamagotchi implements GameEngine {
     this.handlePlayerChoice(playerChoice);
   }
 
-  private handleDeath(): void {
-    if (this.#pet.pollStatus().health === 0) {
-      this.#gameInterface.displayEndGameMessage(EndGameMessages.loss);
+  private async handleDeath(): Promise<void> {
+    const petState = this.#pet.pollStatus();
+    if (petState.health === 0) {
+      this.#gameInterface.displayEndGameMessage(EndGameMessages.loss, petState);
     } else {
-      this.#gameInterface.displayEndGameMessage(EndGameMessages.win);
+      this.#gameInterface.displayEndGameMessage(EndGameMessages.win, petState);
     }
+    await this.gameLoop();
   }
 
   private handlePlayerChoice(playerChoice: PlayerChoice): void {
@@ -75,6 +71,16 @@ export default class Tamagotchi implements GameEngine {
           break;
       }
       this.#gameInterface.displayChoiceResponse(playerChoice);
+    }
+  }
+
+  private async gameLoop(): Promise<void> {
+    const shouldIRun: GameMenu = await this.#gameInterface.promptMainMenu();
+    if (shouldIRun === GameMenu.start) {
+      this.#pet = new Pet({});
+      await this.lifeCycle();
+    } else {
+      this.#gameInterface.terminate();
     }
   }
 }

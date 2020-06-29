@@ -20,6 +20,27 @@ export default class ConsoleUserInterface {
     this.initialiseTerminal();
   }
 
+  displayChoiceResponse(choice: PlayerChoice | 'sleeping' = 'sleeping'): void {
+    if (GAME_MESSAGES[choice]) {
+      this.displayMessageInStarRow(GAME_MESSAGES[choice]);
+    }
+  }
+
+  displayEndGameMessage(gameState: EndGameMessages, petState: PetStatus): void {
+    this.displayMessageInStarRow(END_GAME_MESSAGES[gameState]);
+    this.displayRawStatus(petState);
+  }
+
+  displayRules(): void {
+    this.#terminal.clear();
+    this.#terminal(GAME_RULES);
+  }
+
+  displayStatus(status: PetStatus): void {
+    this.#terminal.clear();
+    this.displayRawStatus(status);
+  }
+
   async promptMainMenu(): Promise<GameMenu> {
     try {
       const choice = await this.singleColumnMenu(TERMINAL_GAME_MENU);
@@ -56,32 +77,25 @@ export default class ConsoleUserInterface {
     }
   }
 
-  displayChoiceResponse(choice: PlayerChoice | 'sleeping' = 'sleeping'): void {
-    if (GAME_MESSAGES[choice]) {
-      this.displayMessageInStarRow(GAME_MESSAGES[choice]);
-    }
-  }
-
-  displayEndGameMessage(status: EndGameMessages): void {
-    this.displayMessageInStarRow(END_GAME_MESSAGES[status]);
-  }
-
-  displayRules(): void {
+  /**
+   * Terminate
+   * From the documentation: https://github.com/cronvel/terminal-kit/blob/master/doc/high-level.md#grabinput-options--safecallback-
+   * Found out that there is a clear in here: https://github.com/cronvel/terminal-kit/blob/master/sample/document/buttons-test.js
+   */
+  terminate(): void {
     this.#terminal.clear();
-    this.#terminal(GAME_RULES);
+    this.#terminal.processExit(0);
   }
 
-  displayStatus(status: PetStatus): void {
-    const {
-      age,
-      health,
-      lifeStage,
-      morale,
-      poopCount,
-      satiety,
-      vigor,
-    } = status;
-    this.#terminal.clear();
+  private displayRawStatus({
+    age,
+    health,
+    lifeStage,
+    morale,
+    poopCount,
+    satiety,
+    vigor,
+  }: PetStatus) {
     const starRow = '*'.repeat(50);
     this.#terminal(`\n${starRow}\n\n`);
     const lifeStageEmoticons = LIFE_STAGE_EMOTICONS[lifeStage].repeat(2);
@@ -95,16 +109,6 @@ export default class ConsoleUserInterface {
     this.displayValue(vigor, '💤💤 Vigor 💤💤');
     this.displayValue(poopCount, '💩💩 Poop 💩💩');
     this.#terminal(`\n\n${starRow}\n`);
-  }
-
-  /**
-   * Terminate
-   * From the documentation: https://github.com/cronvel/terminal-kit/blob/master/doc/high-level.md#grabinput-options--safecallback-
-   * Found out that there is a clear in here: https://github.com/cronvel/terminal-kit/blob/master/sample/document/buttons-test.js
-   */
-  terminate(): void {
-    this.#terminal.clear();
-    this.#terminal.processExit(0);
   }
 
   private displayMessageInStarRow(message: string): void {
