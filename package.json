@@ -4,7 +4,7 @@
   "description": "A CLI to raise a virtual pet",
   "main": "./lib/index.js",
   "bin": {
-    "tamagot-cli": "./lib/index.js"
+    "tamagot-cli": "./bin/index.js"
   },
   "scripts": {
     "build": "npm run clean && tsc -p tsconfig-build.json",
@@ -18,19 +18,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noejon/tamagot-cli.git"
+    "url": "git+https://github.com/noejon/tamagotcli.git"
   },
   "keywords": [
-    "tamagot-cli",
     "tamagotchi",
     "cli"
   ],
   "author": "Jonathan Noé",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/noejon/tamagot-cli/issues"
+    "url": "https://github.com/noejon/tamagotcli/issues"
   },
-  "homepage": "https://github.com/noejon/tamagot-cli#readme",
+  "homepage": "https://github.com/noejon/tamagotcli#readme",
   "devDependencies": {
     "@types/jest": "^26.0.3",
     "@types/node": "^14.0.14",
