@@ -34,14 +34,15 @@ describe('Pet class', () => {
 
     beforeEach(() => {
       pet = new Pet({});
+      /**
+       * Parts of the game are handled with random numbers. For our tests to be consistent,
+       * we need to have random returning a constant value
+       */
+      jest.spyOn(Math, 'random').mockReturnValue(0.5);
     });
 
-    beforeAll(() => {
-      jest.spyOn(global.Math, 'random').mockReturnValue(0.5);
-    });
-
-    afterAll(() => {
-      jest.clearAllMocks();
+    afterEach(() => {
+      jest.resetAllMocks();
     });
 
     describe("when we poll the pet's status", () => {
@@ -69,7 +70,7 @@ describe('Pet class', () => {
             pet.live();
             expect(pet.pollStatus()).toEqual({
               ...expectedPollStatus,
-              morale: 9,
+              morale: 8,
               satiety: 18,
               vigor: 14,
             });
@@ -121,7 +122,7 @@ describe('Pet class', () => {
           it('should return an age less than 27 and a health of 0', () => {
             const { age, health } = pet.pollStatus();
             expect({ age, health }).toEqual({
-              age: 2,
+              age: 1,
               health: 0,
             });
           });
@@ -140,7 +141,7 @@ describe('Pet class', () => {
         });
 
         describe("when we poll the pet's status", () => {
-          it('should return an age of 27 and a health of 40', () => {
+          it('should return an age of 27 and a health of 37', () => {
             const { age, health } = pet.pollStatus();
             expect({ age, health }).toEqual({
               age: 27,
@@ -157,11 +158,143 @@ describe('Pet class', () => {
       });
     });
 
-    // TODO:
-    // feed
-    // playGames
-    // damage
-    // heal
-    // sleep
+    describe('when the feed function is called', () => {
+      describe('when the pet is fed more than three times and live() is called', () => {
+        beforeEach(() => {
+          times(3, () => {
+            pet.feed();
+          });
+          pet.live();
+        });
+
+        it('should return a poop count of 1', () => {
+          const { poopCount } = pet.pollStatus();
+          expect(poopCount).toEqual(1);
+        });
+      });
+
+      describe('when the pet is fed after the satiety level dropped after calling live 3 times (satiety level at 14)', () => {
+        beforeEach(() => {
+          times(3, () => {
+            pet.live();
+          });
+          pet.feed();
+        });
+
+        it('should return a satiety level of 19 (14 + 4 increment)', () => {
+          const { satiety } = pet.pollStatus();
+          expect(satiety).toEqual(19);
+        });
+      });
+    });
+
+    describe('when the play games function is called', () => {
+      describe('when the game is played after the morale level dropped after calling live 4 times (morale level at 2)', () => {
+        beforeEach(() => {
+          times(4, () => {
+            pet.live();
+          });
+          pet.playGames();
+        });
+
+        it('should return a satiety level of 8 (2  + 6 increment)', () => {
+          const { morale } = pet.pollStatus();
+          expect(morale).toEqual(8);
+        });
+      });
+    });
+
+    /**
+     * The sleep is handled with random numbers, here we are cheating by making random return the value we want
+     */
+    describe('when the sleep function is called', () => {
+      describe('when the sleep happens below the sleepiness treshold', () => {
+        beforeEach(() => {
+          avoidDeathLoop(12);
+          pet.sleep();
+        });
+
+        it('should set the pet asleep', () => {
+          expect(pet.isSleeping()).toBe(true);
+        });
+
+        describe('when live happens while asleep and the random value added to the vigor is less than the sleepiness treshold', () => {
+          beforeEach(() => {
+            jest.spyOn(Math, 'random').mockReturnValue(0);
+            pet.live();
+          });
+
+          it('should add the random value to the vigor', () => {
+            const { vigor } = pet.pollStatus();
+            expect(vigor).toEqual(4);
+          });
+        });
+
+        describe('when the random value added to the vigor is more than the sleepiness treshold', () => {
+          beforeEach(() => {
+            jest.spyOn(Math, 'random').mockReturnValue(1);
+            pet.live();
+          });
+
+          it('should reset the vigor to the maxVigor value', () => {
+            const { vigor } = pet.pollStatus();
+            expect(vigor).toEqual(15);
+          });
+        });
+      });
+    });
+
+    describe('when life happens and the vigor reaches the exhausted treshold', () => {
+      beforeEach(() => {
+        avoidDeathLoop(13);
+      });
+
+      it('should set the pet to sleep automatically', () => {
+        expect(pet.isSleeping()).toEqual(true);
+      });
+    });
+
+    describe('when life happens the pet takes damage', () => {
+      describe('when satiety, morale and vigor reach a treshold level', () => {
+        it('should reduce the health by 1 for each status (by 3) when life happens', () => {
+          times(10, () => {
+            pet.live();
+          });
+          expect(pet.pollStatus().health).toEqual(33);
+          pet.live();
+          expect(pet.pollStatus().health).toEqual(30);
+        });
+      });
+
+      describe('when only poop inflicts damage', () => {
+        beforeEach(() => {
+          jest.spyOn(Math, 'random').mockReturnValue(0.5);
+        });
+
+        it('should reduce the health by 1 when life happens', () => {
+          times(7, () => {
+            pet.feed();
+            pet.live();
+          });
+          expect(pet.pollStatus().health).toEqual(37);
+          pet.live();
+          expect(pet.pollStatus().health).toEqual(36);
+        });
+      });
+    });
+
+    describe('when life happens the pet heals', () => {
+      describe('when satiety, morale and vigor are above 75% but the poop amount should deal one damage', () => {
+        it('should not reduce the health when life happens and remain 40', () => {
+          times(100, () => {
+            pet.feed();
+            pet.playGames();
+            pet.sleep();
+            pet.live();
+          });
+          expect(pet.pollStatus().health).toEqual(40);
+        });
+      });
+    });
   });
 });

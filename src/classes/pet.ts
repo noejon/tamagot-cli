@@ -42,8 +42,8 @@ export default class Pet implements Organism {
     maxSatiety = 20,
     maxMorale = 10,
     maxVigor = 15,
-    moraleDecrement = 1,
-    moraleIncrement = 3,
+    moraleDecrement = 2,
+    moraleIncrement = 6,
     poopIncrement = 1,
     poopDecrement = 2,
     poopTreshold = 5,
@@ -165,9 +165,6 @@ export default class Pet implements Organism {
   }
 
   private handleSleep(): void {
-    if (this.#vigor <= this.#exhaustionTreshold) {
-      this.sleep();
-    }
     if (this.#isSleeping) {
       this.#vigor = increment(
         this.#vigor,
@@ -177,6 +174,8 @@ export default class Pet implements Organism {
         this.#vigor = this.#maxVigor;
         this.#isSleeping = false;
       }
+    } else if (this.#vigor <= this.#exhaustionTreshold) {
+      this.sleep();
     }
   }
 
