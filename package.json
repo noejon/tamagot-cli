@@ -1,6 +1,6 @@
 {
-  "name": "tamagotcli",
-  "version": "0.0.1",
+  "name": "tamagot-cli",
+  "version": "0.0.2",
   "description": "A CLI to raise a virtual pet",
   "main": "./lib/index.js",
   "bin": {
