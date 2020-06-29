@@ -1,0 +1,1 @@
+{"version":3,"file":"tamagotchi.d.ts","sourceRoot":"","sources":["../../src/classes/tamagotchi.ts"],"names":[],"mappings":"AAKA,OAAO,EAAE,UAAU,EAAE,MAAM,0BAA0B,CAAC;AAEtD,MAAM,CAAC,OAAO,OAAO,UAAW,YAAW,UAAU;;;IAS7C,GAAG,IAAI,OAAO,CAAC,IAAI,CAAC;YAKZ,SAAS;IAWvB,OAAO,CAAC,QAAQ;YAIF,YAAY;YAKZ,WAAW;IAUzB,OAAO,CAAC,kBAAkB;YAyBZ,QAAQ;CASvB"}
