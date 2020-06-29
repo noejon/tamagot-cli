@@ -1,15 +1,16 @@
-import GameInterface from './gameInterface';
+import ConsoleUserInterface from './consoleUserInterface';
 import Pet from './pet';
 import { GameMenu } from '../enums/gameMenu';
 import { PlayerChoice } from '../enums/playerChoice';
 import { EndGameMessages } from '../enums/endGameMessages';
+import { GameEngine } from '../interfaces/gameEngine';
 
-export default class GameEngine {
-  #gameInterface: GameInterface;
+export default class Tamagotchi implements GameEngine {
+  #gameInterface: ConsoleUserInterface;
   #pet: Pet;
 
   constructor() {
-    this.#gameInterface = new GameInterface();
+    this.#gameInterface = new ConsoleUserInterface();
     this.#pet = new Pet({});
   }
 

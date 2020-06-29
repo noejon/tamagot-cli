@@ -1,5 +1,5 @@
-import GameEngine from './classes/gameEngine';
+import Tamagotchi from './classes/tamagotchi';
 
-const game = new GameEngine();
+const tamagotchi = new Tamagotchi();
 
-game.run();
+tamagotchi.run();

@@ -12,7 +12,7 @@ import { GameMenu } from '../enums/gameMenu';
 import { PlayerChoice } from '../enums/playerChoice';
 import { EndGameMessages } from '../enums/endGameMessages';
 
-export default class GameInterface {
+export default class ConsoleUserInterface {
   #terminal: Terminal;
 
   constructor() {
