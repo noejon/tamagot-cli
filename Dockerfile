@@ -7,5 +7,5 @@ WORKDIR /app
 
 RUN npm install --quiet
 RUN npm run build
-RUN npm publish
 
+CMD ["npm", "start"]
