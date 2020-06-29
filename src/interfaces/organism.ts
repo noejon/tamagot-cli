@@ -4,11 +4,9 @@ export interface Organism {
   clean(): void;
   feed(): void;
   isAlive(): boolean;
-  isExhausted(): boolean;
-  isSleepy(): boolean;
+  isSleeping(): boolean;
   live(): void;
   sleep(): void;
   playGames(): void;
   pollStatus(): PetStatus;
-  poo(): void;
 }

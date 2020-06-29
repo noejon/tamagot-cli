@@ -1,26 +1,28 @@
-import times from 'lodash/times';
 import { Organism } from '../interfaces/organism';
 import { PetStatus } from '../types/petStatus';
 import { PetConfiguration } from '../types/petConfiguration';
 import { LifeStage } from '../enums/lifeStages';
-import { TEENAGE_MAX_AGE, CHILD_MAX_AGE, BABY_MAX_AGE } from '../constants';
+import { TEENAGER_MAX_AGE, CHILD_MAX_AGE, BABY_MAX_AGE } from '../constants';
 import decrement from '../utils/decrement';
 import increment from '../utils/increment';
 
 export default class Pet implements Organism {
-  #age: number;
+  #age = 0;
   #exhaustionTreshold: number;
+  #foodCounter = 0;
   #health: number;
   #healthGainTresholdPercentage: number;
   #healthIncrement: number;
+  #isSleeping = false;
   #maxAge: number;
   #maxHealth: number;
   #maxSatiety: number;
   #maxMorale: number;
   #maxVigor: number;
   #morale: number;
+  #moraleDecrement: number;
   #moraleIncrement: number;
-  #poopCount: number;
+  #poopCount = 0;
   #poopDecrement: number;
   #poopIncrement: number;
   #poopTreshold: number;
@@ -29,6 +31,7 @@ export default class Pet implements Organism {
   #satietyIncrement: number;
   #sleepinessTreshold: number;
   #vigor: number;
+  #vigorDecrement: number;
 
   constructor({
     exhaustionTreshold = 2,
@@ -39,13 +42,15 @@ export default class Pet implements Organism {
     maxSatiety = 20,
     maxMorale = 10,
     maxVigor = 15,
-    moraleIncrement = 3,
+    moraleDecrement = 2,
+    moraleIncrement = 6,
     poopIncrement = 1,
-    poopDecrement = 3,
+    poopDecrement = 2,
     poopTreshold = 5,
-    satietyDecrement = 3,
-    satietyIncrement = 3,
-    sleepinessTreshold = 5,
+    satietyDecrement = 2,
+    satietyIncrement = 5,
+    sleepinessTreshold = 4,
+    vigorDecrement = 1,
   }: PetConfiguration) {
     this.#maxAge = maxAge;
     this.#maxHealth = maxHealth;
@@ -53,11 +58,13 @@ export default class Pet implements Organism {
     this.#maxMorale = maxMorale;
     this.#maxVigor = maxVigor;
     this.#healthIncrement = healthIncrement;
+    this.#moraleDecrement = moraleDecrement;
     this.#moraleIncrement = moraleIncrement;
     this.#poopIncrement = poopIncrement;
     this.#poopDecrement = poopDecrement;
     this.#satietyDecrement = satietyDecrement;
     this.#satietyIncrement = satietyIncrement;
+    this.#vigorDecrement = vigorDecrement;
     this.#exhaustionTreshold = exhaustionTreshold;
     this.#healthGainTresholdPercentage = healthGainTresholdPercentage;
     this.#poopTreshold = poopTreshold;
@@ -66,8 +73,6 @@ export default class Pet implements Organism {
     this.#satiety = this.#maxSatiety;
     this.#morale = this.#maxMorale;
     this.#vigor = this.#maxVigor;
-    this.#age = 0;
-    this.#poopCount = 0;
   }
 
   clean(): void {
@@ -80,31 +85,33 @@ export default class Pet implements Organism {
       this.#satietyIncrement,
       this.#maxSatiety
     );
+    this.#foodCounter++;
   }
 
   isAlive(): boolean {
-    return this.#age <= this.#maxAge;
+    return this.#age < this.#maxAge && this.#health > 0;
   }
 
-  isExhausted(): boolean {
-    return this.#vigor === this.#exhaustionTreshold;
-  }
-
-  isSleepy(): boolean {
-    return this.#vigor <= this.#sleepinessTreshold;
+  isSleeping(): boolean {
+    return this.#isSleeping;
   }
 
   live(): void {
-    this.#morale = decrement(this.#satiety, this.#satietyDecrement);
-    this.#satiety = decrement(this.#satiety, this.#satietyDecrement);
-    this.#vigor = decrement(this.#satiety, this.#satietyDecrement);
-    this.damage();
-    this.heal();
+    if (this.isAlive()) {
+      this.#morale = decrement(this.#morale, this.#moraleDecrement);
+      this.#satiety = decrement(this.#satiety, this.#satietyDecrement);
+      if (!this.#isSleeping) {
+        this.#vigor = decrement(this.#vigor, this.#vigorDecrement);
+        this.poo();
+      }
+      this.damage();
+      this.heal();
+      this.handleSleep();
+    }
   }
 
   sleep(): void {
-    this.#vigor = this.#maxVigor;
-    times(this.#maxVigor / 3, this.live);
+    this.#isSleeping = true;
     this.#age++;
   }
 
@@ -128,16 +135,19 @@ export default class Pet implements Organism {
     };
   }
 
-  poo(): void {
-    this.#poopCount = increment(this.#poopCount, this.#poopIncrement);
+  private poo(): void {
+    const foodTreshold = Math.floor(Math.random() * 4) + 1;
+    if (this.#foodCounter >= foodTreshold) {
+      this.#poopCount = increment(this.#poopCount, this.#poopIncrement);
+      this.#foodCounter = 0;
+    }
   }
 
   private calculateLifeStage(): LifeStage {
-    if (!this.isAlive()) return LifeStage.Angel;
-    if (this.#age > TEENAGE_MAX_AGE) {
+    if (this.#age > TEENAGER_MAX_AGE) {
       return LifeStage.Adult;
     } else if (this.#age > CHILD_MAX_AGE) {
-      return LifeStage.Teenage;
+      return LifeStage.Teenager;
     } else if (this.#age > BABY_MAX_AGE) {
       return LifeStage.Child;
     } else {
@@ -151,7 +161,22 @@ export default class Pet implements Organism {
     if (this.#satiety === 0) damageAmount++;
     if (this.#morale === 0) damageAmount++;
     if (this.#poopCount > this.#poopTreshold) damageAmount++;
-    this.#health -= damageAmount;
+    this.#health = decrement(this.#health, damageAmount);
+  }
+
+  private handleSleep(): void {
+    if (this.#isSleeping) {
+      this.#vigor = increment(
+        this.#vigor,
+        Math.floor(Math.random() * this.#sleepinessTreshold) + 1
+      );
+      if (this.#vigor > this.#sleepinessTreshold) {
+        this.#vigor = this.#maxVigor;
+        this.#isSleeping = false;
+      }
+    } else if (this.#vigor <= this.#exhaustionTreshold) {
+      this.sleep();
+    }
   }
 
   private heal(): void {
@@ -161,12 +186,15 @@ export default class Pet implements Organism {
       this.isVigorous() &&
       this.isWellFed()
     )
-      this.#health += this.#healthIncrement;
-    if (this.#health > this.#maxHealth) this.#health = this.#maxHealth;
+      this.#health = increment(
+        this.#health,
+        this.#healthIncrement,
+        this.#maxHealth
+      );
   }
 
   private isClean(): boolean {
-    return this.#poopCount > this.#poopTreshold;
+    return this.#poopCount <= this.#poopTreshold;
   }
 
   private isHappy(): boolean {

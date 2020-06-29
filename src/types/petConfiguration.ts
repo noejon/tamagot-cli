@@ -7,6 +7,7 @@ export type PetConfiguration = {
   maxSatiety?: number;
   maxMorale?: number;
   maxVigor?: number;
+  moraleDecrement?: number;
   moraleIncrement?: number;
   poopDecrement?: number;
   poopIncrement?: number;
@@ -14,4 +15,5 @@ export type PetConfiguration = {
   satietyDecrement?: number;
   satietyIncrement?: number;
   sleepinessTreshold?: number;
+  vigorDecrement?: number;
 };

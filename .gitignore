@@ -1,3 +1,6 @@
+#Project output
+lib
+
 # Logs
 logs
 *.log
