@@ -1,8 +1,8 @@
-# tamagotcli
+# tamagot-cli
 
 ## About this project
 
-We are creating a CLI to raise a pet tamagotcli.
+We are diving back in the 1990's by creating a CLI to raise a pet, in tamagot-cli.
 A tamagotchi hatches from an egg, after what it will go through all stages of life:
 
 - baby.
@@ -55,16 +55,37 @@ In subsequent sessions, run `nvm use` to switch to node lts.
 
 Follow the [official documentation](https://docs.microsoft.com/en-us/windows/nodejs/setup-on-windows) on a windows operating system.
 
+### Installing dependencies
+
+To install our project dependencies run:
+
+```zsh
+npm install
+```
+
+## Running the game
+
+### Running from node
+
+### Running as CLI
+
+### Installing from npm
+
+### Notes on nodemon
+
+I initially installed nodemon as a dependency to watch for code changes and refresh the game. The problem with that is that nodemon would not yield the terminal to the application and thus it was impossible to watch easily. So when developing in the future, the game needs to be restarded as there is no change listener.
+
 ## Notes
 
-### Loosing time - Status refreshing
+### Time lost - Status refreshing
+
 I have been loosing quite some time figuring out if there was a way to refresh the status of the pet while the prompt for the next action prompt would remain visible. I believe that it could have been achievable, but it would take me too much time. After watching a video of an old tamagotchi, I realised that the status was not displayed on the screen, but it was rather a choice of the user to get that piece of information. In the end I decided to add it to the list of actions that are available to the user. 
 
-### Loosing time - Made the game unwinable
+### Time lost - Made the game unwinable
+
 At first I made the game unwinnable, even in the unit tests. Which led me to spending quite some time trying to figure out what was wrong in my code... In the end, what was wrong was not the code, but rather the harsh default game rules I had set up.
 
-
-## What I could have done better
+## What needs to be improved
 
 ### Status refreshing
 

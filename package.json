@@ -4,7 +4,7 @@
   "description": "A CLI to raise a virtual pet",
   "main": "./lib/index.js",
   "bin": {
-    "tamagot-cli": "./bin/index.js"
+    "tamagot-cli": "./lib/index.js"
   },
   "scripts": {
     "build": "npm run clean && tsc -p tsconfig-build.json",
@@ -13,23 +13,23 @@
     "lint": "eslint src --ext .ts",
     "lint.fix": "eslint src --ext .ts --fix",
     "start": "node lib/index.js",
-    "test": "jest",
-    "watch": "nodemon"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/noejon/tamagotcli.git"
+    "url": "git+https://github.com/noejon/tamagot-cli.git"
   },
   "keywords": [
+    "tamagot-cli",
     "tamagotchi",
     "cli"
   ],
   "author": "Jonathan Noé",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/noejon/tamagotcli/issues"
+    "url": "https://github.com/noejon/tamagot-cli/issues"
   },
-  "homepage": "https://github.com/noejon/tamagotcli#readme",
+  "homepage": "https://github.com/noejon/tamagot-cli#readme",
   "devDependencies": {
     "@types/jest": "^26.0.3",
     "@types/node": "^14.0.14",
@@ -42,7 +42,6 @@
     "eslint-plugin-prettier": "^3.1.4",
     "husky": "^4.2.5",
     "jest": "^26.1.0",
-    "nodemon": "^2.0.4",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.0.5",
     "ts-jest": "^26.1.1",
