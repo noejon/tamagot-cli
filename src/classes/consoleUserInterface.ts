@@ -13,10 +13,7 @@ import { PlayerChoice } from '../enums/playerChoice';
 import { EndGameMessages } from '../enums/endGameMessages';
 
 export default class ConsoleUserInterface {
-  #terminal: Terminal;
-
   constructor() {
-    this.#terminal = terminal;
     this.initialiseTerminal();
   }
 
@@ -32,12 +29,12 @@ export default class ConsoleUserInterface {
   }
 
   displayRules(): void {
-    this.#terminal.clear();
-    this.#terminal(GAME_RULES);
+    terminal.clear();
+    terminal(GAME_RULES);
   }
 
   displayStatus(status: PetStatus): void {
-    this.#terminal.clear();
+    terminal.clear();
     this.displayRawStatus(status);
   }
 
@@ -45,7 +42,7 @@ export default class ConsoleUserInterface {
     try {
       const choice = await this.singleColumnMenu(TERMINAL_GAME_MENU);
       if (choice.selectedIndex === 0) {
-        this.#terminal.clear();
+        terminal.clear();
         return GameMenu.start;
       } else {
         return GameMenu.exit;
@@ -83,8 +80,8 @@ export default class ConsoleUserInterface {
    * Found out that there is a clear in here: https://github.com/cronvel/terminal-kit/blob/master/sample/document/buttons-test.js
    */
   terminate(): void {
-    this.#terminal.clear();
-    this.#terminal.processExit(0);
+    terminal.clear();
+    terminal.processExit(0);
   }
 
   private displayRawStatus({
@@ -97,28 +94,26 @@ export default class ConsoleUserInterface {
     vigor,
   }: PetStatus) {
     const starRow = '*'.repeat(50);
-    this.#terminal(`\n${starRow}\n\n`);
+    terminal(`\n${starRow}\n\n`);
     const lifeStageEmoticons = LIFE_STAGE_EMOTICONS[lifeStage].repeat(2);
-    this.#terminal(
-      `${lifeStageEmoticons}  ${lifeStage}  ${lifeStageEmoticons}`
-    );
+    terminal(`${lifeStageEmoticons}  ${lifeStage}  ${lifeStageEmoticons}`);
     this.displayValue(age, '🎂🎂  Age 🎂🎂 ', 'years old');
     this.displayValue(health, '🏥🏥  Health  🏥🏥');
     this.displayValue(morale, '😃😃 Morale 😃😃');
     this.displayValue(satiety, '🥣🥣  Satiety  🥣🥣');
     this.displayValue(vigor, '💤💤 Vigor 💤💤');
     this.displayValue(poopCount, '💩💩 Poop 💩💩');
-    this.#terminal(`\n\n${starRow}\n`);
+    terminal(`\n\n${starRow}\n`);
   }
 
   private displayMessageInStarRow(message: string): void {
     const starRow = '*'.repeat(50);
-    this.#terminal.clear();
-    this.#terminal(`\n${starRow}\n\n${message}\n\n${starRow}\n`);
+    terminal.clear();
+    terminal(`\n${starRow}\n\n${message}\n\n${starRow}\n`);
   }
 
   private displayValue(value: number, label?: string, suffix?: string): void {
-    this.#terminal(
+    terminal(
       `\n${label ? `${label}: ` : ''}${value}${suffix ? ` ${suffix}` : ''}`
     );
   }
@@ -133,7 +128,7 @@ export default class ConsoleUserInterface {
    * From the documentation: https://github.com/cronvel/terminal-kit/blob/master/doc/high-level.md#grabinput-options--safecallback-
    */
   private addCTRLCKeyListener(): void {
-    this.#terminal.on('key', (name: string) => {
+    terminal.on('key', (name: string) => {
       if (name === 'CTRL_C') this.terminate();
     });
   }
@@ -142,7 +137,7 @@ export default class ConsoleUserInterface {
     menu: Array<string>
   ): Promise<Terminal.SingleColumnMenuResponse> {
     return new Promise((resolve, reject) => {
-      this.#terminal.singleColumnMenu(menu, (error, response) => {
+      terminal.singleColumnMenu(menu, (error, response) => {
         if (error) reject(error);
         else resolve(response);
       });

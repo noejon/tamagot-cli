@@ -115,6 +115,17 @@ npm install --global .
 
 It also enables us to call `tamagot-cli` directly.
 
+### Running from docker
+
+To run the application from docker:
+
+```zsh
+docker build -t tamagot-cli:latest ./
+docker run -it tamagot-cli:latest
+```
+
+The `-i` flag is to keep STDIN open, which is quite handy in our case, as we interact with the terminal.
+
 ### Installing from npm
 
 Before digging in this step, if you used any of the previous way to install the package please either:
@@ -143,9 +154,12 @@ That's it, run `tamagot-cli` and have fun playing the game.
 
 I initially installed nodemon as a dependency to watch for code changes and refresh the game. The problem with that is that nodemon would not yield the terminal to the application and thus it was impossible to watch easily. So when developing in the future, the game needs to be restarded as there is no change listener.
 
-### Notes on docker
+## Stopping the game
 
-For the same reason as for nodemon (the terminal not yielding), running `docker-compose up` will start the project but the terminal won't work. I left the files there because I thik that they could be reused to publish the package to npm.
+There are two ways to stop the game:
+
+- Either by exiting the game when prompted to do so in the main game menu.
+- Or by using the shortcut `ctrl-c` at any time.
 
 ## Publishing the CLI to npm
 
@@ -234,11 +248,17 @@ I have been loosing quite some time figuring out if there was a way to refresh t
 
 At first I made the game unwinnable, even in the unit tests. Which led me to spending quite some time trying to figure out what was wrong in my code... In the end, what was wrong was not the code, but rather the harsh default game rules I had set up.
 
+### Time lost - Unit testing terminal kit
+
+When attempting to test the class ConsoleUserInterface, I ran into an issue where mocking the terminal kit would just set the `terminal` to undefined. This would then make the constructor step fail, as it was trying to call some functions of undefined.
+It finally came to my mind that one thing I could try is to bypass `terminal-kit` and mock `process.stdout.write` directly, and check if that has been called. And that worked as expected.
+
 ## What needs to be improved
 
 ### Tests
 
-At the time of writing, two of the mains classes are not unit tested. It would be preferable to have those unit tests.
+The `Tamagotchi` class is not unit tested. It would be preferable to have those unit tests.
+The `ConsoleUserInterface` is only "partially" tested, I tested only one function. But the process for all othe functions is similar and quite tedious, this is why I tested onl this one function.
 If that was a front-end project, I would write some integration tests, using tools such as `cypress` or `pupeteer`. I did not have time to dig around if it is even possible to do that on a terminal. But that would be the next tests I would write.
 
 ### Status refreshing
@@ -275,3 +295,5 @@ The rules message at the start of the game is not very explanatory. This would p
 ## Final note
 
 The game is winnable. Hard, but winnable.
+
+![BOOM!!!](/docs/BOOM.png)
