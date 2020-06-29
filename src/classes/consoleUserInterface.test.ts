@@ -1,23 +1,18 @@
 import ConsoleUserInterface from './consoleUserInterface';
-import { terminal } from 'terminal-kit';
-
-jest.mock('terminal-kit');
+import { GAME_RULES } from '../constants';
 
 describe('ConsoleUserInterface', () => {
   let ui: ConsoleUserInterface;
+  const originalStdout = process.stdout;
 
   beforeEach(() => {
+    process.stdout.write = jest.fn();
     ui = new ConsoleUserInterface();
   });
 
   afterEach(() => {
+    process.stdout.write = originalStdout.write;
     jest.resetAllMocks();
-  });
-
-  describe('when the UI is initialised', () => {
-    it('should add the on key listener to the terminal', () => {
-      expect(terminal.on).toHaveBeenCalledWith('key');
-    });
   });
 
   describe('when we call display rules', () => {
@@ -25,7 +20,11 @@ describe('ConsoleUserInterface', () => {
       ui.displayRules();
     });
     it('should clear the terminal', () => {
-      expect(terminal.clear).toHaveBeenCalled();
+      expect(process.stdout.write).toHaveBeenCalledWith(GAME_RULES);
     });
   });
+
+  /**
+   * Here there are many other functions that I should write unit test for. But it would be quite tedious and long for the current scope.
+   */
 });
