@@ -1,4 +1,3 @@
-// import times from 'lodash/times'; //TODO: Uninstall
 import { Organism } from '../interfaces/organism';
 import { PetStatus } from '../types/petStatus';
 import { PetConfiguration } from '../types/petConfiguration';
@@ -50,7 +49,7 @@ export default class Pet implements Organism {
     poopTreshold = 5,
     satietyDecrement = 2,
     satietyIncrement = 5,
-    sleepinessTreshold = 7,
+    sleepinessTreshold = 4,
     vigorDecrement = 1,
   }: PetConfiguration) {
     this.#maxAge = maxAge;
@@ -90,7 +89,7 @@ export default class Pet implements Organism {
   }
 
   isAlive(): boolean {
-    return this.#age <= this.#maxAge && this.#health > 0;
+    return this.#age < this.#maxAge && this.#health > 0;
   }
 
   isSleeping(): boolean {
@@ -98,15 +97,17 @@ export default class Pet implements Organism {
   }
 
   live(): void {
-    this.#morale = decrement(this.#morale, this.#moraleDecrement);
-    this.#satiety = decrement(this.#satiety, this.#satietyDecrement);
-    if (!this.#isSleeping) {
-      this.#vigor = decrement(this.#vigor, this.#vigorDecrement);
+    if (this.isAlive()) {
+      this.#morale = decrement(this.#morale, this.#moraleDecrement);
+      this.#satiety = decrement(this.#satiety, this.#satietyDecrement);
+      if (!this.#isSleeping) {
+        this.#vigor = decrement(this.#vigor, this.#vigorDecrement);
+        this.poo();
+      }
+      this.damage();
+      this.heal();
+      this.handleSleep();
     }
-    this.poo();
-    this.damage();
-    this.heal();
-    this.handleSleep();
   }
 
   sleep(): void {
@@ -186,12 +187,15 @@ export default class Pet implements Organism {
       this.isVigorous() &&
       this.isWellFed()
     )
-      this.#health += this.#healthIncrement;
-    if (this.#health > this.#maxHealth) this.#health = this.#maxHealth;
+      this.#health = increment(
+        this.#health,
+        this.#healthIncrement,
+        this.#maxHealth
+      );
   }
 
   private isClean(): boolean {
-    return this.#poopCount > this.#poopTreshold;
+    return this.#poopCount <= this.#poopTreshold;
   }
 
   private isHappy(): boolean {

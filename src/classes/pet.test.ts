@@ -3,6 +3,8 @@ import Pet from './pet';
 import { LifeStage } from '../enums/lifeStages';
 import { PetStatus } from '../types/petStatus';
 
+import { TEENAGER_MAX_AGE, BABY_MAX_AGE, CHILD_MAX_AGE } from '../constants';
+
 describe('Pet class', () => {
   describe('when initiliasing a pet with an empty pet configuration', () => {
     const expectedPollStatus: PetStatus = {
@@ -17,8 +19,29 @@ describe('Pet class', () => {
 
     let pet: Pet;
 
+    const avoidDeathLoop = (loopNumber: number): void => {
+      times(loopNumber, () => {
+        times(6, () => {
+          pet.feed();
+        });
+        pet.clean();
+        times(4, () => {
+          pet.playGames();
+        });
+        pet.live();
+      });
+    };
+
     beforeEach(() => {
       pet = new Pet({});
+    });
+
+    beforeAll(() => {
+      jest.spyOn(global.Math, 'random').mockReturnValue(0.5);
+    });
+
+    afterAll(() => {
+      jest.clearAllMocks();
     });
 
     describe("when we poll the pet's status", () => {
@@ -39,52 +62,106 @@ describe('Pet class', () => {
       });
     });
 
+    describe("when the pet live it's day", () => {
+      describe('when live() is called once', () => {
+        describe('when we call pollStatus', () => {
+          it('should return the status after decrement', () => {
+            pet.live();
+            expect(pet.pollStatus()).toEqual({
+              ...expectedPollStatus,
+              morale: 9,
+              satiety: 18,
+              vigor: 14,
+            });
+          });
+        });
+      });
+
+      describe('when the age passes a life stage mark', () => {
+        [
+          { loopNumber: 400, ageCeiling: 27, expectedResult: LifeStage.Adult },
+          {
+            loopNumber: 200,
+            ageCeiling: TEENAGER_MAX_AGE,
+            expectedResult: LifeStage.Teenager,
+          },
+          {
+            loopNumber: 100,
+            ageCeiling: CHILD_MAX_AGE,
+            expectedResult: LifeStage.Child,
+          },
+          {
+            loopNumber: 1,
+            ageCeiling: BABY_MAX_AGE,
+            expectedResult: LifeStage.Baby,
+          },
+        ].forEach(({ loopNumber, ageCeiling, expectedResult }) => {
+          describe(`when the age is less or equal than (${ageCeiling})`, () => {
+            describe('when we poll the status', () => {
+              beforeEach(() => {
+                avoidDeathLoop(loopNumber);
+              });
+              it('should return true', () => {
+                const { lifeStage } = pet.pollStatus();
+                expect(lifeStage).toEqual(expectedResult);
+              });
+            });
+          });
+        });
+      });
+
+      describe('when the health reaches 0', () => {
+        beforeEach(() => {
+          times(26, () => {
+            pet.live();
+          });
+        });
+
+        describe("when we poll the pet's status", () => {
+          it('should return an age less than 27 and a health of 0', () => {
+            const { age, health } = pet.pollStatus();
+            expect({ age, health }).toEqual({
+              age: 2,
+              health: 0,
+            });
+          });
+        });
+
+        describe('when we call isAlive', () => {
+          it('should return false', () => {
+            expect(pet.isAlive()).toEqual(false);
+          });
+        });
+      });
+
+      describe('when the age reaches 0 and the health is greater than 0', () => {
+        beforeEach(() => {
+          avoidDeathLoop(400);
+        });
+
+        describe("when we poll the pet's status", () => {
+          it('should return an age of 27 and a health of 40', () => {
+            const { age, health } = pet.pollStatus();
+            expect({ age, health }).toEqual({
+              age: 27,
+              health: 37,
+            });
+          });
+        });
+
+        describe('when we call isAlive', () => {
+          it('should return false', () => {
+            expect(pet.isAlive()).toEqual(false);
+          });
+        });
+      });
+    });
+
     // TODO:
-    // live
     // feed
     // playGames
+    // damage
+    // heal
     // sleep
-    // life stages
-
-    describe('when the pet pooes one time', () => {
-      beforeEach(() => {
-        pet.poo();
-      });
-
-      describe("when we poll the pet's status", () => {
-        it('should return an object with an increased poop count', () => {
-          expect(pet.pollStatus().poopCount).toEqual(1);
-        });
-      });
-    });
-
-    describe('when the pet pooes a lesser or equal amount than the decrement value and we clean ', () => {
-      describe("when we poll the pet's status", () => {
-        [1, 2, 3].forEach(poopCount => {
-          it(`should return a status with a poopCount equal to 0 (before clean: ${poopCount}/decrement(3)) `, () => {
-            for (let i = 1; i <= poopCount; i++) {
-              pet.poo();
-            }
-            pet.clean();
-            expect(pet.pollStatus().poopCount).toEqual(0);
-          });
-        });
-      });
-    });
-
-    describe('when the pet pooes more than the decrement value and we clean ', () => {
-      describe("when we poll the pet's status", () => {
-        [4, 5, 6].forEach(poopCount => {
-          const expectedPoopCount: number = poopCount - 3;
-          it(`should return a status with a poopCount equal to ${expectedPoopCount} (before clean: ${poopCount}/decrement(3)) `, () => {
-            for (let i = 1; i <= poopCount; i++) {
-              pet.poo();
-            }
-            pet.clean();
-            expect(pet.pollStatus().poopCount).toEqual(expectedPoopCount);
-          });
-        });
-      });
-    });
   });
 });

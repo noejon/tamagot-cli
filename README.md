@@ -57,9 +57,12 @@ Follow the [official documentation](https://docs.microsoft.com/en-us/windows/nod
 
 ## Notes
 
-### Loosing time
-
+### Loosing time - Status refreshing
 I have been loosing quite some time figuring out if there was a way to refresh the status of the pet while the prompt for the next action prompt would remain visible. I believe that it could have been achievable, but it would take me too much time. After watching a video of an old tamagotchi, I realised that the status was not displayed on the screen, but it was rather a choice of the user to get that piece of information. In the end I decided to add it to the list of actions that are available to the user. 
+
+### Loosing time - Made the game unwinable
+At first I made the game unwinnable, even in the unit tests. Which led me to spending quite some time trying to figure out what was wrong in my code... In the end, what was wrong was not the code, but rather the harsh default game rules I had set up.
+
 
 ## What I could have done better
 
