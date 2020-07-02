@@ -160,7 +160,7 @@ export default class Pet implements Organism {
     if (this.#vigor <= this.#sleepinessTreshold) damageAmount++;
     if (this.#satiety === 0) damageAmount++;
     if (this.#morale === 0) damageAmount++;
-    if (this.#poopCount > this.#poopTreshold) damageAmount++;
+    if (!this.isClean()) damageAmount++;
     this.#health = decrement(this.#health, damageAmount);
   }
 

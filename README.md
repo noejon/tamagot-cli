@@ -288,10 +288,6 @@ Health 42
 
 [terminal-kit](https://github.com/cronvel/terminal-kit) allows us to change the background color of the terminal and to display using different colors. With more time, this would be a nice touch to make this hard game more friendly.
 
-### Rules message
-
-The rules message at the start of the game is not very explanatory. This would probably be a simple task to pick up next for a small win.
-
 ## Final note
 
 The game is winnable. Hard, but winnable.
