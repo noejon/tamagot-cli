@@ -52,6 +52,6 @@
     "@types/lodash": "^4.14.157",
     "@types/terminal-kit": "^1.28.2",
     "lodash": "^4.17.15",
-    "terminal-kit": "^1.35.8"
+    "terminal-kit": "^2.1.8"
   }
 }
